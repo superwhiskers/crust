@@ -22,6 +22,10 @@ along with this program.  if not, see <https://www.gnu.org/licenses/>.
 #include <stdio.h>
 #include <libunwind.h>
 
+#ifndef CRUST_FUNCTION_NAME_LENGTH
+#define CRUST_FUNCTION_NAME_LENGTH 50
+#endif
+
 /* possible types of a Result */
 typedef enum ResultType {
 	ResultOk,
@@ -61,7 +65,7 @@ void panic(char *message) {
 	unw_cursor_t cursor;
 	unw_context_t uc;
 	unw_word_t ip, sp, op;
-	char *name = (char *)(malloc(50));
+	char *name = (char *)(malloc(CRUST_FUNCTION_NAME_LENGTH));
 
 	unw_getcontext(&uc);
 	unw_init_local(&cursor, &uc);
@@ -72,7 +76,7 @@ void panic(char *message) {
 	while (unw_step(&cursor) > 0) {
 		unw_get_reg(&cursor, UNW_REG_IP, &ip);
 		unw_get_reg(&cursor, UNW_REG_SP, &sp);
-		unw_get_proc_name(&cursor, name, 50, &op);
+		unw_get_proc_name(&cursor, name, CRUST_FUNCTION_NAME_LENGTH, &op);
 		printf("%d: %s() +0x%lx\n", i, name, (long)(op));
 		printf("    ip = %lx, sp = %lx\n", ip, sp);
 		i++;
