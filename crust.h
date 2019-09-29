@@ -53,3 +53,19 @@ void result_destroy(struct Result result) {
 void option_destroy(struct Option option) {
 	free(option.data);
 }
+
+int is_err(struct Result res) {
+	if (res.type == ResultErr) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+int is_ok(struct Result res) {
+	if (res.type == ResultOk) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
