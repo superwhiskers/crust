@@ -69,3 +69,19 @@ int is_ok(struct Result res) {
 		return 0;
 	}
 }
+
+int is_some(struct Option opt) {
+	if (opt.type == OptionSome) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
+int is_none(struct Option opt) {
+	if (opt.type == OptionNone) {
+		return 1;
+	} else {
+		return 0;
+	} 
+}
