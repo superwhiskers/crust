@@ -76,7 +76,8 @@ void panic(char *message) {
 	while (unw_step(&cursor) > 0) {
 		unw_get_reg(&cursor, UNW_REG_IP, &ip);
 		unw_get_reg(&cursor, UNW_REG_SP, &sp);
-		unw_get_proc_name(&cursor, name, CRUST_FUNCTION_NAME_LENGTH, &op);
+		unw_get_proc_name(&cursor, name, CRUST_FUNCTION_NAME_LENGTH,
+				  &op);
 		printf("%d: %s() +0x%lx\n", i, name, (long)(op));
 		printf("    ip = %lx, sp = %lx\n", ip, sp);
 		i++;
