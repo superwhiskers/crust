@@ -19,6 +19,8 @@ along with this program.  if not, see <https://www.gnu.org/licenses/>.
 #pragma once
 
 #include <stdlib.h>
+#include <stdio.h>
+#include <libunwind.h>
 
 /* possible types of a Result */
 typedef enum ResultType {
@@ -52,4 +54,29 @@ void result_destroy(struct Result result) {
 /* destroys an Option */
 void option_destroy(struct Option option) {
 	free(option.data);
+}
+
+/* panics from a function and prints a stack trace */
+void panic(char *message) {
+	unw_cursor_t cursor;
+	unw_context_t uc;
+	unw_word_t ip, sp, op;
+	char *name = (char *)(malloc(50));
+
+	unw_getcontext(&uc);
+	unw_init_local(&cursor, &uc);
+
+	printf("panic: %s\n", message);
+
+	int i = 1;
+	while (unw_step(&cursor) > 0) {
+		unw_get_reg(&cursor, UNW_REG_IP, &ip);
+		unw_get_reg(&cursor, UNW_REG_SP, &sp);
+		unw_get_proc_name(&cursor, name, 50, &op);
+		printf("%d: %s() +0x%lx\n", i, name, (long)(op));
+		printf("    ip = %lx, sp = %lx\n", ip, sp);
+		i++;
+	}
+
+	exit(1);
 }
