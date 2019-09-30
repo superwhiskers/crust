@@ -16,7 +16,8 @@ you should have received a copy of the gnu lesser general public license
 along with this program.  if not, see <https://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#ifndef CRUST_H
+#define CRUST_H
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -38,6 +39,18 @@ typedef struct Result {
 	void *data;
 } Result;
 
+/* shorthand for (Result){ ResultOk, (data) } */
+#define Ok(data)                                                               \
+	(Result) {                                                             \
+		ResultOk, (data)                                               \
+	}
+
+/* shorthand for (Result){ ResultErr, (data) } */
+#define Err(data)                                                              \
+	(Result) {                                                             \
+		ResultErr, (data)                                              \
+	}
+
 /* possible types of an Option */
 typedef enum OptionType {
 	OptionSome,
@@ -50,6 +63,18 @@ typedef struct Option {
 	void *data;
 } Option;
 
+/* shorthand for (Option){ OptionSome, (data) } */
+#define Some(data)                                                             \
+	(Option) {                                                             \
+		OptionSome, (data)                                             \
+	}
+
+/* shorthand for (Option){ OptionNone, 0 } */
+#define None                                                                   \
+	(Option) {                                                             \
+		OptionNone, 0                                                  \
+	}
+
 /* destroys a Result */
 void result_destroy(struct Result result) {
 	free(result.data);
@@ -60,8 +85,12 @@ void option_destroy(struct Option option) {
 	free(option.data);
 }
 
-/* panics from a function and prints a stack trace */
-void panic(char *message) {
+/* panics from a function and prints a stack trace. exits with code 1 */
+#define panic(message)                                                         \
+	_Generic((message), char * : panic_with_code)((message), 1)
+
+/* panics from a function and prints a stack trace, then exits the program with the specified exit code */
+void panic_with_code(char *message, int code) {
 	unw_cursor_t cursor;
 	unw_context_t uc;
 	unw_word_t ip, sp, op;
@@ -83,5 +112,7 @@ void panic(char *message) {
 		i++;
 	}
 
-	exit(1);
+	exit(code);
 }
+
+#endif
