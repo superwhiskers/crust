@@ -19,9 +19,9 @@ along with this program.  if not, see <https://www.gnu.org/licenses/>.
 #ifndef CRUST_H
 #define CRUST_H
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <libunwind.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #ifndef CRUST_FUNCTION_NAME_LENGTH
 #define CRUST_FUNCTION_NAME_LENGTH 50
@@ -41,35 +41,35 @@ typedef struct Result {
 
 /* shorthand for (Result){ ResultOk, (data) } */
 #define Ok(data)                                                               \
-  (Result) {                                                             \
-    ResultOk, (data)                                               \
-  }
+	(Result) {                                                             \
+		ResultOk, (data)                                               \
+	}
 
 /* shorthand for (Result){ ResultErr, (data) } */
 #define Err(data)                                                              \
-  (Result) {                                                             \
-    ResultErr, (data)                                              \
-  }
+	(Result) {                                                             \
+		ResultErr, (data)                                              \
+	}
 
 /* destroys a Result */
 void result_destroy(struct Result result) {
-  free(option.data);
+	free(result.data);
 }
 
 /* checks if a Result is of the Err variant */
 int result_is_err(struct Result result) {
-  if (res.type == ResultErr) {
-    return 1;
-  }
-  return 0;
+	if (result.type == ResultErr) {
+		return 1;
+	}
+	return 0;
 }
 
 /* checks if a Result is of the Ok variant */
 int result_is_ok(struct Result result) {
-  if (result.type == ResultOk) {
-    return 1;
-  }
-  return 0;
+	if (result.type == ResultOk) {
+		return 1;
+	}
+	return 0;
 }
 
 /* possible types of an Option */
@@ -114,7 +114,7 @@ int option_is_none(struct Option option) {
 	if (option.type == OptionNone) {
 		return 1;
 	}
-	return 0; 
+	return 0;
 }
 
 /* panics from a function and prints a stack trace. exits with code 1 */
