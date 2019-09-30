@@ -41,15 +41,36 @@ typedef struct Result {
 
 /* shorthand for (Result){ ResultOk, (data) } */
 #define Ok(data)                                                               \
-	(Result) {                                                             \
-		ResultOk, (data)                                               \
-	}
+  (Result) {                                                             \
+    ResultOk, (data)                                               \
+  }
 
 /* shorthand for (Result){ ResultErr, (data) } */
 #define Err(data)                                                              \
-	(Result) {                                                             \
-		ResultErr, (data)                                              \
-	}
+  (Result) {                                                             \
+    ResultErr, (data)                                              \
+  }
+
+/* destroys a Result */
+void result_destroy(struct Result result) {
+  free(option.data);
+}
+
+/* checks if a Result is of the Err variant */
+int result_is_err(struct Result result) {
+  if (res.type == ResultErr) {
+    return 1;
+  }
+  return 0;
+}
+
+/* checks if a Result is of the Ok variant */
+int result_is_ok(struct Result result) {
+  if (result.type == ResultOk) {
+    return 1;
+  }
+  return 0;
+}
 
 /* possible types of an Option */
 typedef enum OptionType {
@@ -75,14 +96,25 @@ typedef struct Option {
 		OptionNone, 0                                                  \
 	}
 
-/* destroys a Result */
-void result_destroy(struct Result result) {
-	free(result.data);
-}
-
 /* destroys an Option */
 void option_destroy(struct Option option) {
 	free(option.data);
+}
+
+/* checks if an Option is of the Some variant */
+int option_is_some(struct Option option) {
+	if (option.type == OptionSome) {
+		return 1;
+	}
+	return 0;
+}
+
+/* checks if an Option is of the None variant */
+int option_is_none(struct Option option) {
+	if (option.type == OptionNone) {
+		return 1;
+	}
+	return 0; 
 }
 
 /* panics from a function and prints a stack trace. exits with code 1 */
