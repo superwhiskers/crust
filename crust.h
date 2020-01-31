@@ -1,6 +1,6 @@
 /*
 
-crust - simple emulations of some rust types in c
+crust - simple emulations of some rust features and bits of functional programming in c
 copyright (c) 2019 superwhiskers <whiskerdev@protonmail.com>
 
 this source code form is subject to the terms of the mozilla public
@@ -12,13 +12,20 @@ file, you can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef CRUST_H
 #define CRUST_H
 
-#include <libunwind.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifndef CRUST_FUNCTION_NAME_LENGTH
-#define CRUST_FUNCTION_NAME_LENGTH 50
-#endif
+/*
+features:
+- optionals (result, option) OPTIONALS
+- map, filter, and reduce    MAP_FILTER_REDUCE
+- panic                      PANIC
+*/
+
+/*
+optionals
+*/
+#ifdef CRUST_FEATURE_OPTIONALS
 
 /* possible types of a Result */
 typedef enum ResultType {
@@ -110,6 +117,69 @@ int option_is_none(struct Option option) {
 	return 0;
 }
 
+#endif
+
+/*
+map, filter, and reduce
+*/
+#ifdef CRUST_FEATURE_MAP_FILTER_REDUCE
+
+/* the type for a function to pass to map. the only parameter is the value to map */
+typedef void(map_function)(void *);
+
+/* the map function implemented in c. it modifies the array in-place */
+void map(char *array, int array_length, int size, map_function *function) {
+	for (int i = 0; i < array_length * size; i += size) {
+		function(array + i);
+	}
+}
+
+/* the type for a function to pass to filter. the only parameter is the value to filter */
+typedef _Bool(filter_function)(void *);
+
+/* the filter function implemented in c. it modifies the array in-place. it returns the new length (in indices) so you can reallocate */
+int filter(char *array, int array_length, int size, filter_function *function) {
+  int length = 0;
+  for (int i = 0; i < array_length * size; i += size) {
+    if (function(array + i)) {
+      // this is literal black magic
+      for (int l = 0; l < size; l++) {
+        // just to have an explaination, this basically uses the fact that 
+        // we know we are accessing a single byte, and copies over the data
+        // byte-by-byte to the destination until we've copied over the known length
+        *(array + (length * size) + l) = *(array + i + l);
+      }
+      length++;
+    }
+  }
+  return length; 
+}
+
+/* the type for a function to pass to reduce. the first parameter is the accumulator, the second is the value to operate on */
+typedef void(reduce_function)(void *, void *);
+
+/* the reduce function implemented in c. the accumulator must be provided by the callee */
+void *reduce(char *array, int array_length, int size, void *accumulator,
+	     reduce_function *function) {
+	for (int i = 0; i < array_length * size; i += size) {
+		function(accumulator, array + i);
+	}
+	return accumulator;
+}
+
+#endif
+
+/*
+panic
+*/
+#ifdef CRUST_FEATURE_PANIC
+
+#include <libunwind.h>
+
+#ifndef CRUST_FUNCTION_NAME_LENGTH
+#define CRUST_FUNCTION_NAME_LENGTH 50
+#endif
+
 /* panics from a function and prints a stack trace. exits with code 1 */
 #define panic(message)                                                         \
 	_Generic((message), char * : panic_with_code)((message), 1)
@@ -139,5 +209,7 @@ void panic_with_code(char *message, int code) {
 
 	exit(code);
 }
+
+#endif
 
 #endif
