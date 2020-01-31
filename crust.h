@@ -128,7 +128,7 @@ map, filter, and reduce
 typedef void(MapFunction)(void *);
 
 /* the map function implemented in c. it modifies the array in-place */
-void map(char *array, int array_length, int size, map_function *function) {
+void map(char *array, int array_length, int size, MapFunction *function) {
 	for (int i = 0; i < array_length * size; i += size) {
 		function(array + i);
 	}
@@ -138,7 +138,7 @@ void map(char *array, int array_length, int size, map_function *function) {
 typedef _Bool(FilterFunction)(void *);
 
 /* the filter function implemented in c. it modifies the array in-place. it returns the new length (in indices) so you can reallocate */
-int filter(char *array, int array_length, int size, filter_function *function) {
+int filter(char *array, int array_length, int size, FilterFunction *function) {
   int length = 0;
   for (int i = 0; i < array_length * size; i += size) {
     if (function(array + i)) {
@@ -158,7 +158,7 @@ typedef void(ReduceFunction)(void *, void *);
 
 /* the reduce function implemented in c. the accumulator must be provided by the callee */
 void *reduce(char *array, int array_length, int size, void *accumulator,
-	     reduce_function *function) {
+	     ReduceFunction *function) {
 	for (int i = 0; i < array_length * size; i += size) {
 		function(accumulator, array + i);
 	}
