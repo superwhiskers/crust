@@ -125,7 +125,7 @@ map, filter, and reduce
 #ifdef CRUST_FEATURE_MAP_FILTER_REDUCE
 
 /* the type for a function to pass to map. the only parameter is the value to map */
-typedef void(map_function)(void *);
+typedef void(MapFunction)(void *);
 
 /* the map function implemented in c. it modifies the array in-place */
 void map(char *array, int array_length, int size, map_function *function) {
@@ -135,7 +135,7 @@ void map(char *array, int array_length, int size, map_function *function) {
 }
 
 /* the type for a function to pass to filter. the only parameter is the value to filter */
-typedef _Bool(filter_function)(void *);
+typedef _Bool(FilterFunction)(void *);
 
 /* the filter function implemented in c. it modifies the array in-place. it returns the new length (in indices) so you can reallocate */
 int filter(char *array, int array_length, int size, filter_function *function) {
@@ -154,7 +154,7 @@ int filter(char *array, int array_length, int size, filter_function *function) {
 }
 
 /* the type for a function to pass to reduce. the first parameter is the accumulator, the second is the value to operate on */
-typedef void(reduce_function)(void *, void *);
+typedef void(ReduceFunction)(void *, void *);
 
 /* the reduce function implemented in c. the accumulator must be provided by the callee */
 void *reduce(char *array, int array_length, int size, void *accumulator,
