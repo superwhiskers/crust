@@ -134,14 +134,14 @@ void map(char *array, int array_length, int size, MapFunction *function) {
 	}
 }
 
-/* the type for a function to pass to filter. the only parameter is the value to filter */
-typedef _Bool(FilterFunction)(void *);
+/* the type for a function to pass to filter. the first parameter is the entire array, the second is the array length, the third is the value to operate on */
+typedef _Bool(FilterFunction)(void *, int, void *);
 
 /* the filter function implemented in c. it modifies the array in-place. it returns the new length (in indices) so you can reallocate */
 int filter(char *array, int array_length, int size, FilterFunction *function) {
   int length = 0;
   for (int i = 0; i < array_length * size; i += size) {
-    if (function(array + i)) {
+    if (function((void *)(array), array_length, array + i)) {
       for (int l = 0; l < size; l++) {
         // we know we are accessing a single byte, so we copy over the
         // data byte-by-byte
