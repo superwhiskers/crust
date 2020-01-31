@@ -142,11 +142,9 @@ int filter(char *array, int array_length, int size, filter_function *function) {
   int length = 0;
   for (int i = 0; i < array_length * size; i += size) {
     if (function(array + i)) {
-      // this is literal black magic
       for (int l = 0; l < size; l++) {
-        // just to have an explaination, this basically uses the fact that 
-        // we know we are accessing a single byte, and copies over the data
-        // byte-by-byte to the destination until we've copied over the known length
+        // we know we are accessing a single byte, so we copy over the
+        // data byte-by-byte
         *(array + (length * size) + l) = *(array + i + l);
       }
       length++;
